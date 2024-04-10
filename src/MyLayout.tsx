@@ -1,29 +1,18 @@
 import React, { useState } from 'react';
-import { Layout as AntLayout, Menu, Card, Form, Input, Button, Modal, Typography } from 'antd';
+import { Layout as AntLayout, Menu, Card, Form, Input, Button, Modal, Typography, Spin } from 'antd';
+import { observer } from 'mobx-react';
+import cardStore, { CardInterface } from './store';
 import { myObject } from './types';
 
 const { Header, Content } = AntLayout;
 const { Title, Paragraph } = Typography;
 
-interface CardInterface {
-    id: number;
-    name: string;
-    surname: string;
-    cardNumber: string;
-    expiration: string;
-    cvv: string;
-}
-
-interface AddCardFormProps {
-    addCard: (values: CardInterface) => void;
-}
-
-const MyLayout: React.FC = () => {
+const MyLayout: React.FC = observer(() => {
     const [aboutMeVisible, setAboutMeVisible] = useState<boolean>(false);
     const [submenuVisible, setSubmenuVisible] = useState<boolean>(false);
-    const [cards, setCards] = useState<CardInterface[]>([]);
     const [showAddCardForm, setShowAddCardForm] = useState<boolean>(false);
-    const [showCardInfo, setShowCardInfo] = useState<boolean>(false);
+    const [editCardData, setEditCardData] = useState<CardInterface | null>(null);
+    const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
 
     const toggleAboutMeModal = () => {
         setAboutMeVisible(!aboutMeVisible);
@@ -34,17 +23,25 @@ const MyLayout: React.FC = () => {
     };
 
     const addCard = (values: CardInterface) => {
-        const newCard: CardInterface = {
-            id: cards.length + 1,
-            name: values.name,
-            surname: values.surname,
-            cardNumber: values.cardNumber,
-            expiration: values.expiration,
-            cvv: values.cvv
-        };
-        setCards([...cards, newCard]);
-        setShowAddCardForm(false);
-        setShowCardInfo(true); // Afiseaza informatia cardului dupa ce este adaugat un nou card
+        cardStore.addCard(values);
+    };
+
+    const deleteCard = (cardId: number) => {
+        cardStore.deleteCard(cardId);
+    };
+
+    const editCard = (card: CardInterface) => {
+        setEditCardData(card);
+        setEditModalVisible(true);
+    };
+
+    const handleEditFormSubmit = (updatedCard: CardInterface) => {
+        cardStore.editCard(updatedCard);
+        setEditModalVisible(false);
+    };
+
+    const handleEditModalCancel = () => {
+        setEditModalVisible(false);
     };
 
     return (
@@ -67,23 +64,45 @@ const MyLayout: React.FC = () => {
                     {showAddCardForm && (
                         <AddCardForm addCard={addCard} />
                     )}
-                    {showCardInfo && (
-                        <Card
-                            title={`${myObject.name} ${myObject.surname}`}
-                            style={{ width: '300px', margin: '16px' }}
+                    {editCardData && (
+                        <Modal
+                            title="Edit Card"
+                            visible={editModalVisible}
+                            onCancel={handleEditModalCancel}
+                            footer={null}
                         >
-                            <p><strong>Card Number:</strong> {myObject.cardNumber}</p>
-                            <p><strong>Expiration:</strong> {myObject.expiration}</p>
-                            <p><strong>CVV:</strong> {myObject.cvv}</p>
-                        </Card>
+                            <EditCardForm card={editCardData} onSubmit={handleEditFormSubmit} />
+                        </Modal>
                     )}
-                    {cards.map(card => (
-                        <Card key={card.id} title={`${card.name} ${card.surname}`} style={{ width: '300px', margin: '16px' }}>
-                            <p><strong>Card Number:</strong> {card.cardNumber}</p>
-                            <p><strong>Expiration:</strong> {card.expiration}</p>
-                            <p><strong>CVV:</strong> {card.cvv}</p>
-                        </Card>
-                    ))}
+                    {cardStore.loading ? ( // Verificăm starea de încărcare pentru a afișa indicatorul de încărcare
+                        <div style={{ display: 'flex', justifyContent: 'center',  alignItems: 'center', height: '85vh', width: '200vh', position: 'fixed' }}>
+                            <Spin size="large" />
+                        </div>
+                    ) : (
+                        <>
+                            {cardStore.showCardInfo && (
+                                <Card
+                                    title={`${myObject.name} ${myObject.surname}`}
+                                    style={{ width: '300px', margin: '16px' }}
+                                >
+                                    <p><strong>Card Number:</strong> {myObject.cardNumber}</p>
+                                    <p><strong>Expiration:</strong> {myObject.expiration}</p>
+                                    <p><strong>CVV:</strong> {myObject.cvv}</p>
+                                </Card>
+                            )}
+                            {cardStore.cards.map(card => (
+                                <Card key={card.id} title={`${card.name} ${card.surname}`} style={{ width: '300px', margin: '16px' }}>
+                                    <p><strong>Card Number:</strong> {card.cardNumber}</p>
+                                    <p><strong>Expiration:</strong> {card.expiration}</p>
+                                    <p><strong>CVV:</strong> {card.cvv}</p>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+                                        <Button type="primary" onClick={() => deleteCard(card.id)}>Delete</Button>
+                                        <Button type="primary" onClick={() => editCard(card)}>Edit</Button>
+                                    </div>
+                                </Card>
+                            ))}
+                        </>
+                    )}
                 </div>
             </Content>
             <Modal
@@ -100,9 +119,9 @@ const MyLayout: React.FC = () => {
             </Modal>
         </AntLayout>
     );
-};
+});
 
-const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
+const AddCardForm: React.FC<{ addCard: (values: CardInterface) => void }> = ({ addCard }) => {
     const [form] = Form.useForm();
 
     const onFinish = (values: any) => {
@@ -111,7 +130,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
     };
 
     const validateName = (_: any, value: string) => {
-        const regex = /^[a-zA-Z\s]+$/; // Permite doar litere și spații
+        const regex = /^[a-zA-Z\s]+$/;
         if (!regex.test(value)) {
             return Promise.reject(new Error('Please enter only letters for name'));
         }
@@ -119,7 +138,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
     };
 
     const validateSurname = (_: any, value: string) => {
-        const regex = /^[a-zA-Z\s]+$/; // Permite doar litere și spații
+        const regex = /^[a-zA-Z\s]+$/;
         if (!regex.test(value)) {
             return Promise.reject(new Error('Please enter only letters for surname'));
         }
@@ -127,7 +146,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
     };
 
     const validateCardNumber = (_: any, value: string) => {
-        const regex = /^\d+$/; // Permite doar cifre
+        const regex = /^\d+$/;
         if (!regex.test(value)) {
             return Promise.reject(new Error('Please enter only digits for card number'));
         }
@@ -136,13 +155,11 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
 
 
     const validateExpiration = (_: any, value: string) => {
-        // Adaugăm bara (/) după două cifre introduse pentru lună
         if (value.length === 2 && !value.includes('/')) {
             value += '/';
             form.setFieldsValue({ expiration: value });
         }
 
-        // Verificăm formatul: două cifre pentru lună, bara (/), două cifre pentru an
         const regex = /^(0[1-9]|1[0-2])\/(20\d{2}|2[1-9])$/;
         if (!regex.test(value)) {
             return Promise.reject(new Error('Please enter a valid expiration date (MM/YY)'));
@@ -178,6 +195,41 @@ const AddCardForm: React.FC<AddCardFormProps> = ({ addCard }) => {
             <Form.Item>
                 <Button type="primary" htmlType="submit">
                     Add Card
+                </Button>
+            </Form.Item>
+        </Form>
+    );
+};
+
+const EditCardForm: React.FC<{ card: CardInterface; onSubmit: (updatedCard: CardInterface) => void }> = ({ card, onSubmit }) => {
+    const [form] = Form.useForm();
+
+    form.setFieldsValue(card);
+
+    const onFinish = (values: any) => {
+        onSubmit({ ...card, ...values });
+    };
+
+    return (
+        <Form form={form} onFinish={onFinish}>
+            <Form.Item name="name">
+                <Input placeholder="Name" />
+            </Form.Item>
+            <Form.Item name="surname">
+                <Input placeholder="Surname" />
+            </Form.Item>
+            <Form.Item name="cardNumber">
+                <Input placeholder="Card Number" maxLength={16} />
+            </Form.Item>
+            <Form.Item name="expiration">
+                <Input placeholder="Expiration (MM/YY)" maxLength={5} />
+            </Form.Item>
+            <Form.Item name="cvv">
+                <Input placeholder="CVV" maxLength={3} />
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit">
+                    Save Changes
                 </Button>
             </Form.Item>
         </Form>
