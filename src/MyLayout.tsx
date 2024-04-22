@@ -7,12 +7,19 @@ import { myObject } from './types';
 const { Header, Content } = AntLayout;
 const { Title, Paragraph } = Typography;
 
-const MyLayout: React.FC = observer(() => {
+interface MyLayoutProps {
+    handleLogout: () => void;
+}
+
+
+const MyLayout: React.FC<MyLayoutProps> = observer(({ handleLogout }) => {
     const [aboutMeVisible, setAboutMeVisible] = useState<boolean>(false);
     const [submenuVisible, setSubmenuVisible] = useState<boolean>(false);
     const [showAddCardForm, setShowAddCardForm] = useState<boolean>(false);
     const [editCardData, setEditCardData] = useState<CardInterface | null>(null);
     const [editModalVisible, setEditModalVisible] = useState<boolean>(false);
+
+
 
     const toggleAboutMeModal = () => {
         setAboutMeVisible(!aboutMeVisible);
@@ -57,8 +64,10 @@ const MyLayout: React.FC = observer(() => {
                         <Menu.Item key="3" onClick={() => setShowAddCardForm(true)}>Add card</Menu.Item>
                     </Menu.SubMenu>
                     <Menu.Item key="5"><a href="/">Contact Us</a></Menu.Item>
+                    <Menu.Item key="6" onClick={handleLogout}>Logout</Menu.Item>
                 </Menu>
             </Header>
+
             <Content style={{ padding: '0 50px' }}>
                 <div className="site-layout-content" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
                     {showAddCardForm && (
