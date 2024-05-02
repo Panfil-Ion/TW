@@ -5,6 +5,7 @@ import MyLayout from './MyLayout';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import { BrowserRouter } from 'react-router-dom';
+import {Button} from 'antd';
 
 const App: React.FC = () => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -70,31 +71,30 @@ const App: React.FC = () => {
                         <MyLayout handleLogout={handleLogout} />
                     </>
                 ) : (
-                    <>
+                    <div className="form-container">
                         {showRegisterForm ? (
                             <>
                                 <RegisterForm onRegister={handleRegister} />
-                                <button onClick={() => setShowRegisterForm(false)}>Back to Login</button>
+                                <div className="button-container">
+                                    <Button type="primary" shape="round" size="small" onClick={() => setShowRegisterForm(false)}>Back to Login</Button>
+                                </div>
                             </>
                         ) : (
                             <>
                                 <LoginForm onLogin={handleLogin} />
-                                <button onClick={() => setShowRegisterForm(true)}>Register</button>
+                                <div className="button-container">
+                                    <Button type="primary" shape="round" size="small" onClick={() => setShowRegisterForm(true)}>Register</Button>
+                                </div>
                                 {loginError && <p style={{ color: 'red' }}>{loginError}</p>}
                             </>
                         )}
-                    </>
+                    </div>
                 )}
             </div>
         </div>
     );
 };
 
-ReactDOM.render(
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>,
-    document.getElementById('root')
-);
+
 
 export default App;

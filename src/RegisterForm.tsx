@@ -33,12 +33,15 @@ const RegisterForm: React.FC<{ onRegister: (email: string, password: string) => 
     };
 
     return (
+        <div className="register-form">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h2>Register</h2>
             <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
             <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleRegister}>Register</button>
             {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        </div>
         </div>
     );
 };
