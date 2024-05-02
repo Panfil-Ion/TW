@@ -3,6 +3,9 @@ import { Layout as AntLayout, Menu, Card, Form, Input, Button, Modal, Typography
 import { observer } from 'mobx-react';
 import cardStore, { CardInterface } from './store';
 import { myObject } from './types';
+import { BrowserRouter as Router, Link, Route, Routes } from 'react-router-dom';
+import LoginForm from './LoginForm';
+
 
 const { Header, Content } = AntLayout;
 const { Title, Paragraph } = Typography;
@@ -52,24 +55,36 @@ const MyLayout: React.FC<MyLayoutProps> = observer(({ handleLogout }) => {
     };
 
     return (
-        <AntLayout style={{ minHeight: '100vh' }}>
-            <Header>
-                <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['0']} style={{ width: 'fit-content' }}>
-                    <Menu.Item key="1" onClick={toggleAboutMeModal}>About me</Menu.Item>
-                    <Menu.SubMenu
-                        key="sub1"
-                        title={<span onClick={toggleSubmenu}>Cards</span>}
-                        popupClassName={submenuVisible ? "submenu-open" : ""}
-                    >
-                        <Menu.Item key="3" onClick={() => setShowAddCardForm(true)}>Add card</Menu.Item>
-                    </Menu.SubMenu>
-                    <Menu.Item key="5"><a href="/">Contact Us</a></Menu.Item>
-                    <Menu.Item key="6" onClick={handleLogout}>Logout</Menu.Item>
-                </Menu>
-            </Header>
+        <Router>
+            <AntLayout style={{ minHeight: '100vh' }}>
+                <Header>
+                    <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['0']} style={{ width: 'fit-content' }}>
 
-            <Content style={{ padding: '0 50px' }}>
-                <div className="site-layout-content" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Menu.Item key="1" onClick={toggleAboutMeModal}>
+                            <Button type="primary" shape="round" size="small" style={{ minWidth: 'auto' }}>
+                                <Link to="/about">About me</Link>
+                            </Button>
+                        </Menu.Item>
+                        <Menu.Item key="2" style={{ minWidth: 'auto' }}>
+                            <Button type="primary" shape="round" size="small"><Link to="/add-card">Add Card</Link></Button>
+                        </Menu.Item>
+                        <Menu.Item key="3" style={{ minWidth: 'auto' }}>
+                            <Button type="primary" shape="round" size="small"><Link to="/Cards">Cards</Link></Button>
+                        </Menu.Item>
+                        <Menu.Item key="4" onClick={handleLogout} style={{ minWidth: 'auto' }}>
+                            <Button type="primary" shape="round" size="small"><Link to="/login">Logout</Link></Button>
+                        </Menu.Item>
+                    </Menu>
+                </Header>
+
+
+                <Content style={{ padding: '0 50px' }}>
+                    <div className="site-layout-content" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Routes>
+                            <Route path="/add-card" element={<AddCardForm addCard={addCard} />} />
+                            
+                        </Routes>
+
                     {showAddCardForm && (
                         <AddCardForm addCard={addCard} />
                     )}
@@ -114,6 +129,7 @@ const MyLayout: React.FC<MyLayoutProps> = observer(({ handleLogout }) => {
                     )}
                 </div>
             </Content>
+
             <Modal
                 title="About Me"
                 visible={aboutMeVisible}
@@ -126,7 +142,10 @@ const MyLayout: React.FC<MyLayoutProps> = observer(({ handleLogout }) => {
                     <Paragraph>Sunt în grupa <strong>CR-221</strong>.</Paragraph>
                 </div>
             </Modal>
+
         </AntLayout>
+
+            </Router>
     );
 });
 

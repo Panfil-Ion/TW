@@ -1,13 +1,89 @@
+/* App.css */
+
 .App-header {
   background-color: rgb(219, 217, 196); /* Schimbați culoarea fundalului */
   color: #000; /* Schimbați culoarea textului */
   font-size: 24px; /* Schimbați dimensiunea fontului */
   text-align: center; /* Aliniați textul în centru */
 }
-/* App.css */
-
-
 
 .login-form {
-  /* Stilurile pentru modelul de login */
+  margin-top: 100px;
+  width: 300px; /* Definim o lățime fixă pentru formular */
+  /* Centrăm formularul pe pagină */
+  padding: 20px; /* Adăugăm puțin spațiu între margine și conținut */
+  border: 1px solid #ccc; /* Adăugăm o margine subțire */
+  border-radius: 5px; /* Rotunjim marginile formularului */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adăugăm o umbră ușoară */
+}
+
+.login-form h2 {
+  margin-bottom: 20px; /* Adăugăm puțin spațiu între titlu și restul formularului */
+}
+
+.login-form input {
+  width: 100%; /* Faceți ca intrările să umple întreaga lățime a formularului */
+  margin-bottom: 15px; /* Adăugăm puțin spațiu între intrări */
+  padding: 10px; /* Adăugăm puțin spațiu între marginea și conținut */
+  border: 1px solid #ccc; /* Adăugăm o margine subțire */
+  border-radius: 3px; /* Rotunjim marginile intrărilor */
+}
+
+.login-form button {
+  width: 100%; /* Faceți ca butonul să umple întreaga lățime a formularului */
+  padding: 10px; /* Adăugăm puțin spațiu între marginea și conținut */
+  background-color: #007bff; /* Schimbăm culoarea fundalului butonului la același albastru ca și header-ul */
+  color: #fff; /* Schimbăm culoarea textului butonului la alb */
+  border: none; /* Eliminăm bordura butonului */
+  border-radius: 3px; /* Rotunjim marginile butonului */
+  cursor: pointer; /* Arătăm cursorul de mână când utilizatorul trece peste buton */
+}
+
+.login-form button:hover {
+  background-color: #0056b3; /* Schimbăm culoarea fundalului butonului la o nuanță mai întunecată de albastru la hover */
+}
+.register-form {
+  margin-top: 100px;
+  width: 300px;
+
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-form h2 {
+  margin-bottom: 20px;
+}
+
+.register-form input {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.register-form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.register-form button:hover {
+  background-color: #0056b3;
+}
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  margin-top: 10px;
 }
